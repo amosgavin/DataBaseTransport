@@ -8,6 +8,7 @@ import com.maywide.dbt.util.TableUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,19 +86,25 @@ public class JdbcUtilServices {
         //System.out.println("SQL =" +insertSql);
         long t1 = System.currentTimeMillis();
         DbContextHolder.setDBType(inDataSource);
-        int[] result =  springJdbcTemplate.batchUpdate(insertSql.toString(), new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                Map<String,Object> oneMap = valueList.get(i);
-                for (int j = 0; j < keys.length; j++) {
-                    preparedStatement.setObject(j+1,oneMap.get(keys[j]));
+        int[] result = null;
+        try {
+            result = springJdbcTemplate.batchUpdate(insertSql.toString(), new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                    Map<String, Object> oneMap = valueList.get(i);
+                    for (int j = 0; j < keys.length; j++) {
+                        preparedStatement.setObject(j + 1, oneMap.get(keys[j]));
+                    }
                 }
-            }
-            @Override
-            public int getBatchSize() {
-                return valueList.size();
-            }
-        });
+
+                @Override
+                public int getBatchSize() {
+                    return valueList.size();
+                }
+            });
+        } catch (DuplicateKeyException e) {
+            log.error("DuplicateKeyException:{}", e);
+        }
         long t2 = System.currentTimeMillis();
         log.info("批量插入- [成功] - "+inDataSource+",table ="+targetTable+",数量="+valueList.size()+"耗时:["+(t2-t1)+"ms]");
         return result;

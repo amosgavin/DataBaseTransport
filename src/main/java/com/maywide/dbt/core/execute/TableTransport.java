@@ -7,7 +7,6 @@ import com.maywide.dbt.config.datasource.dynamic.DynamicDataSource;
 import com.maywide.dbt.core.pojo.oracle.*;
 import com.maywide.dbt.core.services.DdlSqlServices;
 import com.maywide.dbt.util.SpringJdbcTemplate;
-import oracle.jdbc.OracleConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,9 +123,6 @@ public class TableTransport {
             if(cc instanceof ConnectionProxyImpl ){
                 ConnectionProxyImpl connectionProxy = (ConnectionProxyImpl) cc;
                 Connection c1 = connectionProxy.getConnectionRaw();
-                if(c1 instanceof  OracleConnection){
-                    ((OracleConnection) c1).setRemarksReporting(true);
-                }
             }
 
 

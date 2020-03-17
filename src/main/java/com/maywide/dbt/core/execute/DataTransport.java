@@ -85,7 +85,7 @@ public class DataTransport {
         public void run() {
             try {
                 //1.判断表在否（不在的话,就调用tableTransprort 复制表）
-                for (String targetDb : targetDBlist) {
+                /*for (String targetDb : targetDBlist) {
                     TableInfo tableInfo = null;
                     if(!jdbcUtilServices.existTable(targetDb,tableName)){
                         if(null == tableInfo){
@@ -93,7 +93,7 @@ public class DataTransport {
                         }
                         tableTransport.copyTableToMySql(targetDb,tableInfo);
                     }
-                }
+                }*/
                 //2.查询源数据
                 String sourceSql = "select * from "+schema+"."+tableName;
                 int count = jdbcUtilServices.count(oriDatasource,sourceSql);
@@ -156,6 +156,8 @@ public class DataTransport {
                     //TODO 可以增加一个oracle 判断 去掉 rownum 字段，或者优化分页Sql
                     //logSql = logSql + JSON.toJSONString(valueList.get(0));
                     for (Map<String, Object> stringObjectMap : valueList) {
+                        stringObjectMap.remove("f_id");
+                        stringObjectMap.remove("f_nid");
                         if(stringObjectMap.containsKey(Constants.ORACLE_PAGE_RONUM_FILED)){
                             stringObjectMap.remove(Constants.ORACLE_PAGE_RONUM_FILED);
                         }
